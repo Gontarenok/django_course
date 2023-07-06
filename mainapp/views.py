@@ -1,6 +1,7 @@
 # from django.shortcuts import render
 # from django.http import HttpResponse
 from django.views.generic import View, TemplateView
+from datetime import datetime
 
 
 # def hello_world(request):
@@ -19,6 +20,17 @@ class MainPageView(TemplateView):
 
 class NewsPageView(TemplateView):
     template_name = 'mainapp/news.html'
+
+    def get_context_data(self, **kwargs):
+        contex = super().get_context_data(**kwargs)
+
+        contex['news_title'] = 'Первый пробный заговок'
+        contex['news_preview'] = 'Предварительное описание для первой новости'
+
+        contex['range'] = range(5)
+        contex['datetime_obj'] = datetime.now()
+
+        return contex
 
 
 class CoursesPageView(TemplateView):
