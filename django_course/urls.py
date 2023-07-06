@@ -22,8 +22,6 @@ from mainapp import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('', views.hello_world, name='hello_world'),
-    # path('<str:word>/', views.check_kwargs),
     path('', RedirectView.as_view(url='mainapp/')),
-    path('mainapp/', include('mainapp.urls'))
+    path('mainapp/', include('mainapp.urls', namespace='mainapp')),
 ]

@@ -4,16 +4,6 @@ from django.views.generic import View, TemplateView
 from datetime import datetime
 
 
-# def hello_world(request):
-#     return HttpResponse('Hello world!')
-
-# class HelloWorldView(View):
-#     def get(self, *args):
-#         return HttpResponse('Hello world!')
-
-# def check_kwargs(request, **kwargs):
-#     return HttpResponse(f'kwargs:<br>{kwargs}')
-
 class MainPageView(TemplateView):
     template_name = 'mainapp/index.html'
 
@@ -31,6 +21,13 @@ class NewsPageView(TemplateView):
         contex['datetime_obj'] = datetime.now()
 
         return contex
+
+
+class NewsWithPaginatorView(NewsPageView):
+    def get_context_data(self, page, **kwargs):
+        context = super().get_context_data(page=page, **kwargs)
+        context['page_num'] = page
+        return context
 
 
 class CoursesPageView(TemplateView):
