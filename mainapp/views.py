@@ -1,5 +1,8 @@
 # from django.shortcuts import render
-# from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
+import json
+
+from django.conf import settings
 from django.views.generic import View, TemplateView
 from datetime import datetime
 
@@ -14,13 +17,24 @@ class NewsPageView(TemplateView):
     def get_context_data(self, **kwargs):
         contex = super().get_context_data(**kwargs)
 
-        contex['news_title'] = 'Первый пробный заговок'
-        contex['news_preview'] = 'Предварительное описание для первой новости'
+        # contex['news_title'] = 'Первый пробный заголовок'
+        # contex['news_preview'] = 'Предварительное описание для первой новости'
+        #
+        # contex['range'] = range(5)
+        # contex['datetime_obj'] = datetime.now()
 
-        contex['range'] = range(5)
-        contex['datetime_obj'] = datetime.now()
-
+        # Task 6
+        with open(settings.BASE_DIR / 'news.json', encoding="utf-8") as news_file:
+            contex['object_list'] = json.load(news_file)
         return contex
+
+    # Task 7
+    def get(self, *args, **kwargs):
+        query = self.request.GET.get('q', None)
+        if query:
+            return HttpResponseRedirect(f'https://google.ru/search?q={query}')
+
+        return super().get(*args, **kwargs)
 
 
 class NewsWithPaginatorView(NewsPageView):
