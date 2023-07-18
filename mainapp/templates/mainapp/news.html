@@ -6,35 +6,24 @@
 
     {% with range as double_range %}
 
-
         <div class="container-md">
 
-
             <div class="row">
-
                 <div class="col-lg-8">
 
-
-                    {% for news_item in object_list %}
+                    {% for item in news_qs %}
                         <div class="card my-2">
                             <div class="card-body">
-                                <h5 class="card-title">{{ news_item.title }}</h5>
-                                <h6 class="card-subtitle mb-2 text-muted">{{ news_item.date }}</h6>
-                                <p class="card-text">{{ news_item.preview }}</p>
-                                <a href="#" class="card-link">Подробнее</a>
+                                <h5 class="card-title">{{ item.title }}</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">
+                                    {{ item.created_at|date:"Y-m-d h-i-s" }}
+                                </h6>
+                                <p class="card-text">{{ item.preamble }}</p>
+                                <a href="{% url 'mainapp:news_detail' pk=item.pk %}"
+                                   class="card-link">Подробнее</a>
                             </div>
                         </div>
                     {% endfor %}
-
-                    <div class="card my-2">
-                        <div class="card-body">
-                            <h5 class="card-title">Поисковая новость</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">{% now 'Y-m-d H-i' %}</h6>
-                            <p class="card-text">Фраза для поиска: django framework</p>
-                            <a href="{% url 'mainapp:news' %}?q=django framework" class="card-link">Подробнее</a>
-                        </div>
-                    </div>
-
 
                 </div>
 
@@ -70,19 +59,9 @@
                 <nav aria-label="Page navigation example">
                     <ul class="pagination">
                         <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-
-                        {#  {% for i in double_range %}#}
-                        {#      <li class="page-item"><a class="page-link" href="#">{{ i }}</a></li>#}
-                        {#  {% endfor %}#}
-
-                        <li class="page-item">
-                            <a class="page-link" href="{% url 'mainapp:news_paginator' 1 %}?param1=foobar">1</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="{% url 'mainapp:news_paginator' page=2 %}">2</a>
-                        </li>
-                         <li class="page-item"><a class="page-link" href="{% url 'mainapp:news_paginator' 3 %}">3</a></li>
-
+                        <li class="page-item"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        {# <li class="page-item"><a class="page-link" href="#">3</a></li> #}
                         <li class="page-item"><a class="page-link" href="#">Next</a></li>
                     </ul>
                 </nav>
