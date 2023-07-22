@@ -80,3 +80,7 @@ class CourseTeachers(BaseModel):
         return "{0:0>3} {1} {2}".format(
             self.pk, self.name_second, self.name_first
         )
+
+    class Meta:
+        verbose_name = 'учитель'
+        verbose_name_plural = 'учителя'

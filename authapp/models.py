@@ -18,6 +18,7 @@ def users_avatars_path(instance, filename):
     suff = Path(filename).suffix
     return "user_{0}/avatars/{1}".format(instance.username, f"pic_{num}{suff}")
 
+
 # class CustomUser(AbstractUser):
 #     email = models.EmailField(blank=True, verbose_name='Email', queue=True)
 #     age = models.PositiveSmallIntegerField(verbose_name='Возраст', **NULLABLE)
@@ -26,6 +27,7 @@ def users_avatars_path(instance, filename):
 #     class Meta:
 #         verbose_name = 'пользователь'
 #         verbose_name_plural = 'пользователи'
+
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
 
@@ -36,7 +38,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         max_length=150,
         unique=True,
         help_text=_(
-            "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+            "Required. 150 characters or fewer. ASCII letters and digits only."
         ),
         validators=[username_validator],
         error_messages={

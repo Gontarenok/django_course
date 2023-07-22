@@ -24,13 +24,21 @@
                         Профиль
                     </a>
                     <div class="dropdown-menu" aria-labelledby="ddProfile">
-                        <a class="dropdown-item" href="{% url 'authapp:profile_edit' %}">Редактировать профиль</a>
+                        <a class="dropdown-item"
+                           href="{% url 'authapp:profile_edit' pk=request.user.pk %}">Редактировать
+                            профиль</a>
                         <a class="dropdown-item" href="#">Мои курсы</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="#">Модерация</a>
-                        <a class="dropdown-item" href="#">Административный раздел</a>
+                        {% if user.is_superuser %}
+                            <a class="dropdown-item" href="{% url 'admin:index' %}">Административный раздел</a>
+                        {% endif %}
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Выход</a>
+                        {% if user.is_authenticated %}
+                            <a class="dropdown-item" href="{% url 'authapp:logout' %}">Выйти</a>
+                        {% else %}
+                            <a class="dropdown-item" href="{% url 'authapp:login' %}">Войти</a>
+                        {% endif %}
                     </div>
                 </li>
                 <li class="nav-item {% if request.resolver_match.view_name == 'mainapp:contacts' %}active{% endif %}">
