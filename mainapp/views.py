@@ -1,65 +1,66 @@
-from django.http import HttpResponse, HttpResponseRedirect
-# import json
-from mainapp import models as mainapp_models
+from django.contrib.auth.mixins import (
+    LoginRequiredMixin,
+    PermissionRequiredMixin,
+)
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
+from django.urls import reverse_lazy
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    DetailView,
+    ListView,
+    TemplateView,
+    UpdateView,
+)
 
-from django.conf import settings
-from django.views.generic import TemplateView
-from datetime import datetime
+from mainapp import forms as mainapp_forms
+from mainapp import models as mainapp_models
 
 
 class MainPageView(TemplateView):
-    template_name = 'mainapp/index.html'
+    template_name = "mainapp/index.html"
 
 
-class NewsPageView(TemplateView):
-    template_name = 'mainapp/news.html'
+class NewsListView(ListView):
+    model = mainapp_models.News
+    paginate_by = 5
 
-    def get_context_data(self, **kwargs):
-        contex = super().get_context_data(**kwargs)
-
-        # Task 6
-        # with open(settings.BASE_DIR / 'news.json', encoding="utf-8") as news_file:
-        #     contex['object_list'] = json.load(news_file)
-        # return contex
-
-        # Get all previous data
-        context = super().get_context_data(**kwargs)
-        # Create your own data
-        context["news_qs"] = mainapp_models.News.objects.all()[:5]
-        return context
-
-    # # Task 7
-    # def get(self, *args, **kwargs):
-    #     query = self.request.GET.get('q', None)
-    #     if query:
-    #         return HttpResponseRedirect(f'https://google.ru/search?q={query}')
-    #
-    #     return super().get(*args, **kwargs)
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted=False)
 
 
-class NewsPageDetailView(TemplateView):
-    template_name = "mainapp/news_detail.html"
-
-    def get_context_data(self, pk=None, **kwargs):
-        context = super().get_context_data(pk=pk, **kwargs)
-        context["news_object"] = get_object_or_404(mainapp_models.News, pk=pk)
-        return context
+class NewsCreateView(PermissionRequiredMixin, CreateView):
+    model = mainapp_models.News
+    fields = "__all__"
+    success_url = reverse_lazy("mainapp:news")
+    permission_required = ("mainapp.add_news",)
 
 
-class NewsWithPaginatorView(NewsPageView):
-    def get_context_data(self, page, **kwargs):
-        context = super().get_context_data(page=page, **kwargs)
-        context['page_num'] = page
-        return context
+class NewsDetailView(DetailView):
+    model = mainapp_models.News
+
+
+class NewsUpdateView(PermissionRequiredMixin, UpdateView):
+    model = mainapp_models.News
+    fields = "__all__"
+    success_url = reverse_lazy("mainapp:news")
+    permission_required = ("mainapp.change_news",)
+
+
+class NewsDeleteView(PermissionRequiredMixin, DeleteView):
+    model = mainapp_models.News
+    success_url = reverse_lazy("mainapp:news")
+    permission_required = ("mainapp.delete_news",)
 
 
 class CoursesListView(TemplateView):
-    template_name = 'mainapp/courses_list.html'
+    template_name = "mainapp/courses_list.html"
 
     def get_context_data(self, **kwargs):
         context = super(CoursesListView, self).get_context_data(**kwargs)
-        context["objects"] = mainapp_models.Course.objects.all()[:8]
+        context["objects"] = mainapp_models.Course.objects.all()[:7]
         return context
 
 
@@ -77,16 +78,34 @@ class CoursesDetailView(TemplateView):
         context["teachers"] = mainapp_models.CourseTeachers.objects.filter(
             course=context["course_object"]
         )
+        if not self.request.user.is_anonymous:
+            if not mainapp_models.CourseFeedback.objects.filter(
+                course=context["course_object"], user=self.request.user
+            ).count():
+                context["feedback_form"] = mainapp_forms.CourseFeedbackForm(
+                    course=context["course_object"], user=self.request.user
+                )
+        context["feedback_list"] = mainapp_models.CourseFeedback.objects.filter(
+            course=context["course_object"]
+        ).order_by("-created", "-rating")[:5]
         return context
 
 
+class CourseFeedbackFormProcessView(LoginRequiredMixin, CreateView):
+    model = mainapp_models.CourseFeedback
+    form_class = mainapp_forms.CourseFeedbackForm
+
+    def form_valid(self, form):
+        self.object = form.save()
+        rendered_card = render_to_string(
+            "mainapp/includes/feedback_card.html", context={"item": self.object}
+        )
+        return JsonResponse({"card": rendered_card})
+
+
 class ContactsPageView(TemplateView):
-    template_name = 'mainapp/contacts.html'
+    template_name = "mainapp/contacts.html"
 
 
 class DocSitePageView(TemplateView):
-    template_name = 'mainapp/doc_site.html'
-
-
-class LoginPageView(TemplateView):
-    template_name = 'mainapp/login.html'
+    template_name = "mainapp/doc_site.html"
