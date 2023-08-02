@@ -52,6 +52,7 @@ if DEBUG:
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -220,6 +221,11 @@ CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379"
 EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
 EMAIL_FILE_PATH = "var/email-messages/"
 
+# При DEBUG = False 500-e ошибки будут приходить админу на почту
+# ADMINS = (
+#     ('email@gmail.com', 'Vika')
+# )
+
 
 # Yandex
 # EMAIL_HOST = 'smtp.yandex.ru'
@@ -231,3 +237,8 @@ EMAIL_FILE_PATH = "var/email-messages/"
 # Google
 # EMAIL_USE_SSL = False
 # EMAIL_USE_TLS = True
+
+LOCALE_PATHS = [BASE_DIR / 'locale']
+
+
+SELENIUM_DRIVER_PATH_FF = BASE_DIR / 'var' / 'selenuim' / 'geckdriver'
